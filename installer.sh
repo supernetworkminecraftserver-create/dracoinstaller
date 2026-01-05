@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ============================================
-# Draco Control System - Felix Studios
-# Version: 3.0.0 - GitHub Edition
+# Draco Installer - Felix Studios
+# Version: 2.2.0 - Fixed Daemon Flow
 # ============================================
 
 # Colores para la terminal
@@ -21,32 +21,27 @@ PANEL_PORT="3000"
 DAEMON_PORT="3001"
 FTP_PORT="3002"
 SERVER_IP=""
-PANEL_URL=""
-PANEL_KEY=""
-ADMIN_USER="admin"
-ADMIN_PASS="admin123"
-ADMIN_EMAIL="admin@draco.local"
 
 # Función para obtener la IP del servidor
 get_server_ip() {
     SERVER_IP=$(curl -s https://api.ipify.org || curl -s https://ifconfig.me || hostname -I | awk '{print $1}' || echo "localhost")
 }
 
-# Función para mostrar el banner
+# Función para mostrar el banner VISHUBI
 show_banner() {
     clear
     echo -e "${PURPLE}"
     echo "╔════════════════════════════════════════════════════════════════════════════════╗"
     echo "║                                                                                ║"
-    echo "║  ██████╗ ██████╗  █████╗  ██████╗ ██████╗      ██████╗██████╗ ███████╗██████╗  ║"
-    echo "║  ██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔═══██╗    ██╔════╝██╔══██╗██╔════╝██╔══██╗ ║"
-    echo "║  ██║  ██║██████╔╝███████║██║     ██║   ██║    ██║     ██████╔╝█████╗  ██████╔╝ ║"
-    echo "║  ██║  ██║██╔══██╗██╔══██║██║     ██║   ██║    ██║     ██╔══██╗██╔══╝  ██╔══██╗ ║"
-    echo "║  ██████╔╝██║  ██║██║  ██║╚██████╗╚██████╔╝    ╚██████╗██║  ██║███████╗██║  ██║ ║"
-    echo "║  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═════╝      ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝ ║"
+    echo "║  ██╗   ██╗██╗███████╗██╗  ██╗██╗   ██╗██████╗ ██╗                           ║"
+    echo "║  ██║   ██║██║██╔════╝██║  ██║██║   ██║██╔══██╗██║                           ║"
+    echo "║  ██║   ██║██║███████╗███████║██║   ██║██████╔╝██║                           ║"
+    echo "║  ╚██╗ ██╔╝██║╚════██║██╔══██║██║   ██║██╔══██╗██║                           ║"
+    echo "║   ╚████╔╝ ██║███████║██║  ██║╚██████╔╝██████╔╝███████╗                      ║"
+    echo "║    ╚═══╝  ╚═╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝                      ║"
     echo "║                                                                                ║"
-    echo "║                     ${CYAN}D R A C O   C O N T R O L   S Y S T E M${PURPLE}                    ║"
-    echo "║                           ${YELLOW}Powered by Felix Studios${PURPLE}                           ║"
+    echo "║                     ${CYAN}Draco Panel & Daemon Installer${PURPLE}                    ║"
+    echo "║                          ${YELLOW}Powered by Felix Studios${PURPLE}                     ║"
     echo "║                                                                                ║"
     echo "╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
@@ -55,236 +50,178 @@ show_banner() {
 # Función para mostrar el menú principal
 show_main_menu() {
     echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║                               ${WHITE}🎯 MAIN MENU${CYAN}                                  ║${NC}"
+    echo -e "${CYAN}║                             ${WHITE}🎯 MENÚ PRINCIPAL ${CYAN}                            ║${NC}"
     echo -e "${CYAN}╠════════════════════════════════════════════════════════════════════════════════╣${NC}"
     echo -e "${CYAN}║                                                                                ║${NC}"
-    echo -e "${CYAN}║  ${GREEN}1. 🚀 Install Draco Panel                                         ${CYAN}║${NC}"
-    echo -e "${CYAN}║  ${GREEN}2. ⚙️  Install Draco Daemon                                        ${CYAN}║${NC}"
-    echo -e "${CYAN}║  ${BLUE}3. 🔧 Configure Daemon                                             ${CYAN}║${NC}"
-    echo -e "${CYAN}║  ${BLUE}4. 🔄 Manage Services                                              ${CYAN}║${NC}"
-    echo -e "${CYAN}║  ${YELLOW}5. 📊 System Status                                               ${CYAN}║${NC}"
-    echo -e "${CYAN}║  ${RED}6. 🚪 Exit                                                          ${CYAN}║${NC}"
+    echo -e "${CYAN}║  ${GREEN}1. 🚀 Instalar Panel Draco                                         ${CYAN}║${NC}"
+    echo -e "${CYAN}║  ${GREEN}2. ⚙️  Instalar Daemon Draco                                        ${CYAN}║${NC}"
+    echo -e "${CYAN}║  ${BLUE}3. 🔄 Reiniciar Servicios                                          ${CYAN}║${NC}"
+    echo -e "${CYAN}║  ${BLUE}4. 📊 Ver Estado de Servicios                                      ${CYAN}║${NC}"
+    echo -e "${CYAN}║  ${YELLOW}5. 🛠️  Configurar Daemon                                          ${CYAN}║${NC}"
+    echo -e "${CYAN}║  ${RED}6. 🚪 Salir                                                         ${CYAN}║${NC}"
     echo -e "${CYAN}║                                                                                ║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
-    echo -e "${WHITE}Select an option [1-6]: ${NC}"
-}
-
-# Función para verificar y actualizar el sistema
-update_system() {
-    echo -e "${YELLOW}🔄 Updating system packages...${NC}"
-    sudo apt-get update -y > /dev/null 2>&1
-    echo -e "${GREEN}✅ System updated${NC}"
-}
-
-# Función para instalar dependencias básicas
-install_basic_deps() {
-    echo -e "${YELLOW}📦 Installing basic dependencies...${NC}"
-    
-    # Lista de dependencias esenciales
-    local deps=(
-        "curl"
-        "git"
-        "wget"
-        "build-essential"
-        "libssl-dev"
-        "unzip"
-        "zip"
-        "sudo"
-    )
-    
-    for dep in "${deps[@]}"; do
-        if ! command -v $dep >/dev/null 2>&1; then
-            echo -e "${YELLOW}  Installing $dep...${NC}"
-            sudo apt-get install -y $dep > /dev/null 2>&1
-        fi
-    done
-    
-    echo -e "${GREEN}✅ Basic dependencies installed${NC}"
-}
-
-# Función para instalar Node.js 23.x
-install_nodejs() {
-    if command -v node >/dev/null 2>&1; then
-        NODE_VERSION=$(node --version | cut -d'v' -f2)
-        echo -e "${GREEN}✅ Node.js $NODE_VERSION already installed${NC}"
-        return 0
-    fi
-    
-    echo -e "${YELLOW}⬇️ Installing Node.js 23.x...${NC}"
-    
-    # Instalar Node.js desde NodeSource
-    curl -fsSL https://deb.nodesource.com/setup_23.x | sudo -E bash - > /dev/null 2>&1
-    sudo apt-get install -y nodejs > /dev/null 2>&1
-    
-    if command -v node >/dev/null 2>&1; then
-        NODE_VERSION=$(node --version)
-        echo -e "${GREEN}✅ $NODE_VERSION installed${NC}"
-        return 0
-    else
-        echo -e "${RED}❌ Failed to install Node.js${NC}"
-        return 1
-    fi
+    echo -e "${WHITE}👉 Selecciona una opción [1-6]: ${NC}"
 }
 
 # Función para instalar PM2
 install_pm2() {
+    echo -e "${YELLOW}📦 Instalando PM2...${NC}"
+    
     if command -v pm2 >/dev/null 2>&1; then
-        echo -e "${GREEN}✅ PM2 already installed${NC}"
+        echo -e "${GREEN}✅ PM2 ya está instalado${NC}"
         return 0
     fi
     
-    echo -e "${YELLOW}📦 Installing PM2 process manager...${NC}"
-    
-    # Instalar PM2 globalmente
-    sudo npm install -g pm2 > /dev/null 2>&1
-    
-    if command -v pm2 >/dev/null 2>&1; then
+    if npm install -g pm2 --silent 2>/dev/null; then
+        echo -e "${GREEN}✅ PM2 instalado correctamente${NC}"
+        
         # Configurar PM2 para inicio automático
-        echo -e "${YELLOW}⚙️ Setting up PM2 startup...${NC}"
-        pm2 startup > /dev/null 2>&1
-        echo -e "${GREEN}✅ PM2 installed and configured${NC}"
+        echo -e "${YELLOW}⚙️  Configurando PM2 para inicio automático...${NC}"
+        pm2 startup 2>/dev/null
+        pm2 save 2>/dev/null
+        
         return 0
     else
-        echo -e "${RED}❌ Failed to install PM2${NC}"
-        return 1
+        echo -e "${RED}❌ Error instalando PM2${NC}"
+        echo -e "${YELLOW}Intentando con sudo...${NC}"
+        
+        if sudo npm install -g pm2 --silent 2>/dev/null; then
+            echo -e "${GREEN}✅ PM2 instalado con sudo${NC}"
+            return 0
+        else
+            echo -e "${RED}❌ No se pudo instalar PM2${NC}"
+            echo -e "${YELLOW}Puedes instalar PM2 manualmente después con:${NC}"
+            echo -e "${BLUE}npm install -g pm2${NC}"
+            return 1
+        fi
     fi
-}
-
-# Función para crear usuario administrador manualmente
-create_admin_user() {
-    local panel_dir="$1"
-    
-    echo -e "${YELLOW}👤 Creating admin user...${NC}"
-    
-    cd "$panel_dir" || return 1
-    
-    # Verificar si hay un script de creación de usuario
-    if [ -f "package.json" ] && grep -q "createUser" package.json; then
-        echo -e "${YELLOW}  Running createUser script...${NC}"
-        npm run createUser 2>/dev/null || {
-            echo -e "${YELLOW}  createUser script failed, creating manually...${NC}"
-        }
-    fi
-    
-    # Intentar crear usuario manualmente
-    echo -e "${YELLOW}  Setting up admin credentials...${NC}"
-    
-    # Crear archivo de configuración de usuario si existe la estructura
-    if [ -d "config" ]; then
-        cat > config/admin.json << EOF
-{
-    "username": "$ADMIN_USER",
-    "password": "$ADMIN_PASS",
-    "email": "$ADMIN_EMAIL",
-    "admin": true,
-    "createdAt": "$(date -Iseconds)"
-}
-EOF
-        echo -e "${GREEN}  ✅ Admin configuration created${NC}"
-    fi
-    
-    # Mostrar credenciales
-    echo ""
-    echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════${NC}"
-    echo -e "${CYAN}                          ADMIN CREDENTIALS                                    ${NC}"
-    echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════${NC}"
-    echo ""
-    echo -e "${WHITE}👤 Username: ${GREEN}$ADMIN_USER${NC}"
-    echo -e "${WHITE}🔑 Password: ${GREEN}$ADMIN_PASS${NC}"
-    echo -e "${WHITE}📧 Email:    ${GREEN}$ADMIN_EMAIL${NC}"
-    echo ""
-    echo -e "${YELLOW}⚠️  IMPORTANT: Change these credentials after first login!${NC}"
-    echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════${NC}"
-    echo ""
-    
-    cd "$INSTALL_DIR"
 }
 
 # Función para verificar puerto
 check_port() {
     local port=$1
     
-    # Usar netstat si está disponible
+    # Intentar con netstat
     if command -v netstat >/dev/null 2>&1; then
         if netstat -tuln 2>/dev/null | grep -q ":$port "; then
             return 1
         fi
     fi
     
-    # Usar ss si está disponible
+    # Intentar con ss
     if command -v ss >/dev/null 2>&1; then
         if ss -tuln 2>/dev/null | grep -q ":$port "; then
             return 1
         fi
     fi
     
-    # Intentar conectar al puerto
-    if timeout 1 bash -c "echo > /dev/tcp/localhost/$port" 2>/dev/null; then
-        return 1
+    # Intentar con lsof
+    if command -v lsof >/dev/null 2>&1; then
+        if lsof -i :$port 2>/dev/null >/dev/null; then
+            return 1
+        fi
     fi
     
     return 0
 }
 
+# Función para crear usuario administrador manualmente
+create_admin_user() {
+    local panel_dir="$1"
+    
+    cd "$panel_dir" || return 1
+    
+    echo -e "${YELLOW}👤 Configurando usuario administrador...${NC}"
+    
+    # Crear credenciales por defecto
+    cat > admin_credentials.txt << EOF
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                         CREDENCIALES DE ADMINISTRADOR                          ║
+╠════════════════════════════════════════════════════════════════════════════════╣
+║                                                                                ║
+║   🔐 Usuario: admin                                                            ║
+║   🔑 Contraseña: admin123                                                      ║
+║   📧 Email: admin@draco.local                                                  ║
+║                                                                                ║
+║   ⚠️  IMPORTANTE: Cambia estas credenciales después del primer inicio de sesión ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+EOF
+    
+    echo -e "${GREEN}✅ Credenciales guardadas en admin_credentials.txt${NC}"
+    
+    # Si hay un script createUser, intentar ejecutarlo
+    if [ -f "package.json" ] && grep -q "createUser" package.json; then
+        echo -e "${YELLOW}Intentando crear usuario automáticamente...${NC}"
+        npm run createUser 2>/dev/null || echo -e "${YELLOW}⚠️  Usando credenciales por defecto${NC}"
+    fi
+    
+    cd "$INSTALL_DIR"
+}
+
 # Función para instalar el Panel
 install_panel() {
     echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║                          ${WHITE}🚀 INSTALLING DRACO PANEL${CYAN}                         ║${NC}"
+    echo -e "${CYAN}║                         ${WHITE}🚀 INSTALACIÓN DEL PANEL ${CYAN}                        ║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     
     # Verificar si ya está instalado
     if [ -d "v4panel" ]; then
-        echo -e "${YELLOW}⚠️ Panel already installed at: $INSTALL_DIR/v4panel${NC}"
-        read -p "Reinstall? (y/N): " reinstall
-        if [[ ! $reinstall =~ ^[Yy]$ ]]; then
+        echo -e "${YELLOW}⚠️  El panel ya está instalado en: $INSTALL_DIR/v4panel${NC}"
+        read -p "¿Deseas reinstalar? (s/N): " reinstall
+        if [[ ! $reinstall =~ ^[Ss]$ ]]; then
+            echo -e "${YELLOW}Instalación cancelada${NC}"
             return
         fi
-        echo -e "${YELLOW}🗑️ Removing previous installation...${NC}"
+        echo -e "${YELLOW}🗑️  Eliminando instalación anterior...${NC}"
         rm -rf v4panel
     fi
     
     # Actualizar sistema
-    update_system
+    echo -e "${YELLOW}🔄 Actualizando sistema...${NC}"
+    sudo apt-get update -y > /dev/null 2>&1
     
-    # Instalar dependencias básicas
-    install_basic_deps
+    # Instalar dependencias
+    echo -e "${YELLOW}📦 Instalando dependencias del sistema...${NC}"
+    sudo apt-get install -y curl git zip unzip > /dev/null 2>&1
     
     # Instalar Node.js
-    if ! install_nodejs; then
-        echo -e "${RED}❌ Node.js installation failed${NC}"
-        return 1
-    fi
+    echo -e "${YELLOW}⬇️  Instalando Node.js 23.x...${NC}"
+    curl -fsSL https://deb.nodesource.com/setup_23.x | sudo -E bash - > /dev/null 2>&1
+    sudo apt-get install -y nodejs > /dev/null 2>&1
     
-    # Clonar repositorio del panel
-    echo -e "${YELLOW}📥 Cloning panel repository...${NC}"
+    # Clonar repositorio
+    echo -e "${YELLOW}📥 Clonando repositorio del panel...${NC}"
     if git clone https://github.com/teryxlabs/v4panel.git; then
-        echo -e "${GREEN}✅ Repository cloned${NC}"
+        echo -e "${GREEN}✅ Repositorio clonado correctamente${NC}"
     else
-        echo -e "${RED}❌ Failed to clone repository${NC}"
+        echo -e "${RED}❌ Error al clonar el repositorio${NC}"
         return 1
     fi
     
+    # Entrar al directorio
     cd v4panel || {
-        echo -e "${RED}❌ Failed to enter panel directory${NC}"
+        echo -e "${RED}❌ Error al entrar al directorio${NC}"
         return 1
     }
     
     # Extraer panel.zip si existe
     if [ -f "panel.zip" ]; then
-        echo -e "${YELLOW}📦 Extracting panel.zip...${NC}"
+        echo -e "${YELLOW}📦 Extrayendo panel.zip...${NC}"
         unzip -o panel.zip > /dev/null 2>&1
     fi
     
     # Instalar dependencias de Node.js
-    echo -e "${YELLOW}📦 Installing Node.js dependencies...${NC}"
+    echo -e "${YELLOW}📦 Instalando dependencias de Node.js...${NC}"
     npm install --silent
     
     # Ejecutar seed si existe
     if [ -f "package.json" ] && grep -q "seed" package.json; then
-        echo -e "${YELLOW}🌱 Running database seed...${NC}"
-        npm run seed 2>/dev/null || echo -e "${YELLOW}⚠️ Seed command may have issues${NC}"
+        echo -e "${YELLOW}🌱 Configurando base de datos...${NC}"
+        npm run seed 2>/dev/null || echo -e "${YELLOW}⚠️  Continuando con configuración manual${NC}"
     fi
     
     # Crear usuario administrador
@@ -294,7 +231,7 @@ install_panel() {
     install_pm2
     
     # Verificar puerto
-    echo -e "${YELLOW}🔍 Checking port $PANEL_PORT...${NC}"
+    echo -e "${YELLOW}🔍 Verificando puerto $PANEL_PORT...${NC}"
     if check_port $PANEL_PORT; then
         # Buscar archivo principal
         MAIN_FILE=""
@@ -307,7 +244,7 @@ install_panel() {
         
         if [ -n "$MAIN_FILE" ]; then
             # Iniciar panel con PM2
-            echo -e "${YELLOW}🚀 Starting panel with PM2...${NC}"
+            echo -e "${YELLOW}🚀 Iniciando panel con PM2...${NC}"
             pm2 start $MAIN_FILE --name "draco-panel" --silent
             pm2 save --silent
             
@@ -315,117 +252,157 @@ install_panel() {
             
             echo ""
             echo -e "${GREEN}════════════════════════════════════════════════════════════════════════════════${NC}"
-            echo -e "${GREEN}                            ✅ PANEL INSTALLATION COMPLETE                          ${NC}"
+            echo -e "${GREEN}                            ✅ INSTALACIÓN COMPLETADA                           ${NC}"
             echo -e "${GREEN}════════════════════════════════════════════════════════════════════════════════${NC}"
             echo ""
-            echo -e "${CYAN}🌐 Panel Access URLs:${NC}"
+            echo -e "${CYAN}📊 Panel Draco instalado y ejecutándose correctamente${NC}"
+            echo ""
+            echo -e "${WHITE}🌐 URLs de acceso:${NC}"
             echo -e "${BLUE}   • Local:    http://localhost:$PANEL_PORT${NC}"
-            echo -e "${BLUE}   • Network:  http://$SERVER_IP:$PANEL_PORT${NC}"
+            echo -e "${BLUE}   • Red:      http://$SERVER_IP:$PANEL_PORT${NC}"
             echo ""
-            echo -e "${CYAN}👤 Admin Credentials:${NC}"
-            echo -e "${WHITE}   • Username: ${GREEN}$ADMIN_USER${NC}"
-            echo -e "${WHITE}   • Password: ${GREEN}$ADMIN_PASS${NC}"
+            echo -e "${WHITE}👤 Credenciales por defecto:${NC}"
+            echo -e "${YELLOW}   • Usuario:     admin${NC}"
+            echo -e "${YELLOW}   • Contraseña:  admin123${NC}"
+            echo -e "${YELLOW}   • Email:       admin@draco.local${NC}"
             echo ""
-            echo -e "${CYAN}🔧 PM2 Commands:${NC}"
-            echo -e "${YELLOW}   • View logs:     pm2 logs draco-panel${NC}"
-            echo -e "${YELLOW}   • Restart:       pm2 restart draco-panel${NC}"
-            echo -e "${YELLOW}   • Status:        pm2 status${NC}"
+            echo -e "${WHITE}🔧 Comandos útiles:${NC}"
+            echo -e "${YELLOW}   • Ver logs:        pm2 logs draco-panel${NC}"
+            echo -e "${YELLOW}   • Reiniciar:       pm2 restart draco-panel${NC}"
+            echo -e "${YELLOW}   • Detener:         pm2 stop draco-panel${NC}"
+            echo -e "${YELLOW}   • Ver todos:       pm2 list${NC}"
+            echo ""
+            echo -e "${WHITE}⚠️  IMPORTANTE:${NC}"
+            echo -e "${YELLOW}   • Las credenciales están en admin_credentials.txt${NC}"
+            echo -e "${YELLOW}   • Cambia la contraseña después del primer acceso${NC}"
             echo ""
         else
-            echo -e "${RED}❌ No main file found to start${NC}"
+            echo -e "${RED}❌ No se encontró archivo principal para iniciar${NC}"
+            echo -e "${YELLOW}📁 Archivos buscados: index.js, app.js, server.js, main.js${NC}"
         fi
     else
-        echo -e "${RED}❌ Port $PANEL_PORT is already in use${NC}"
-        echo -e "${YELLOW}Try changing the port in panel configuration${NC}"
+        echo -e "${RED}❌ El puerto $PANEL_PORT está en uso${NC}"
+        echo -e "${YELLOW}Por favor, libera el puerto o configura un puerto diferente${NC}"
     fi
     
+    # Volver al directorio original
     cd "$INSTALL_DIR"
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -p "Presiona Enter para continuar..."
 }
 
-# Función para instalar el Daemon
+# Función para instalar el Daemon (FLUJO CORREGIDO)
 install_daemon() {
     echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║                         ${WHITE}⚙️ INSTALLING DRACO DAEMON${CYAN}                       ║${NC}"
+    echo -e "${CYAN}║                        ${WHITE}⚙️  INSTALACIÓN DEL DAEMON ${CYAN}                        ║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     
-    # Pedir configuración del panel
-    echo -e "${YELLOW}📝 Panel Configuration Needed:${NC}"
+    # Pedir configuración ANTES de instalar
+    echo -e "${YELLOW}📝 Necesitamos configurar el daemon con tu panel:${NC}"
     echo ""
     
-    read -p "Panel URL (e.g., http://your-server.com:3000): " PANEL_URL
-    read -p "Panel Access Key (from panel config.json): " PANEL_KEY
+    read -p "URL del Panel (ej: https://pgc5tp-3000.csb.app): " panel_url
+    read -p "Clave del Panel (ej: f773a79a-4059-4222-bca8-2bf17330872d): " panel_key
     
-    if [ -z "$PANEL_URL" ] || [ -z "$PANEL_KEY" ]; then
-        echo -e "${RED}❌ Both URL and Key are required${NC}"
+    if [ -z "$panel_url" ] || [ -z "$panel_key" ]; then
+        echo -e "${RED}❌ Ambas credenciales son requeridas${NC}"
         return 1
     fi
     
+    echo ""
+    
     # Verificar si ya está instalado
     if [ -d "daemon" ]; then
-        echo -e "${YELLOW}⚠️ Daemon already installed at: $INSTALL_DIR/daemon${NC}"
-        read -p "Reinstall? (y/N): " reinstall
-        if [[ ! $reinstall =~ ^[Yy]$ ]]; then
+        echo -e "${YELLOW}⚠️  El daemon ya está instalado en: $INSTALL_DIR/daemon${NC}"
+        read -p "¿Deseas reinstalar? (s/N): " reinstall
+        if [[ ! $reinstall =~ ^[Ss]$ ]]; then
+            echo -e "${YELLOW}Instalación cancelada${NC}"
             return
         fi
-        echo -e "${YELLOW}🗑️ Removing previous installation...${NC}"
+        echo -e "${YELLOW}🗑️  Eliminando instalación anterior...${NC}"
         rm -rf daemon
     fi
     
     # Actualizar sistema
-    update_system
+    echo -e "${YELLOW}🔄 Actualizando sistema...${NC}"
+    sudo apt-get update -y > /dev/null 2>&1
     
-    # Instalar dependencias básicas
-    install_basic_deps
+    # Instalar dependencias
+    echo -e "${YELLOW}📦 Instalando dependencias del sistema...${NC}"
+    sudo apt-get install -y curl git zip unzip > /dev/null 2>&1
     
-    # Instalar Node.js
-    if ! install_nodejs; then
-        echo -e "${RED}❌ Node.js installation failed${NC}"
-        return 1
-    fi
-    
-    # Clonar repositorio del daemon
-    echo -e "${YELLOW}📥 Cloning daemon repository...${NC}"
+    # Clonar repositorio
+    echo -e "${YELLOW}📥 Clonando repositorio del daemon...${NC}"
     if git clone https://github.com/teryxlabs/daemon.git; then
-        echo -e "${GREEN}✅ Repository cloned${NC}"
+        echo -e "${GREEN}✅ Repositorio clonado correctamente${NC}"
     else
-        echo -e "${RED}❌ Failed to clone repository${NC}"
+        echo -e "${RED}❌ Error al clonar el repositorio${NC}"
         return 1
     fi
     
+    # Entrar al directorio
     cd daemon || {
-        echo -e "${RED}❌ Failed to enter daemon directory${NC}"
+        echo -e "${RED}❌ Error al entrar al directorio${NC}"
         return 1
     }
     
-    # Entrar al subdirectorio si existe
+    # Extraer daemon.zip si existe
+    if [ -f "daemon.zip" ]; then
+        echo -e "${YELLOW}📦 Extrayendo daemon.zip...${NC}"
+        unzip -o daemon.zip > /dev/null 2>&1
+    fi
+    
+    # Entrar al subdirectorio daemon (si existe)
     if [ -d "daemon" ]; then
-        echo -e "${YELLOW}📁 Entering daemon/daemon subdirectory...${NC}"
+        echo -e "${YELLOW}📁 Entrando al subdirectorio daemon/...${NC}"
         cd daemon || {
-            echo -e "${RED}❌ Failed to enter subdirectory${NC}"
+            echo -e "${RED}❌ Error al entrar al subdirectorio${NC}"
             return 1
         }
     fi
     
-    # Extraer daemon.zip si existe
-    if [ -f "daemon.zip" ]; then
-        echo -e "${YELLOW}📦 Extracting daemon.zip...${NC}"
-        unzip -o daemon.zip > /dev/null 2>&1
-    fi
-    
     # Instalar dependencias de Node.js
-    echo -e "${YELLOW}📦 Installing Node.js dependencies...${NC}"
+    echo -e "${YELLOW}📦 Instalando dependencias de Node.js...${NC}"
     npm install --silent
     
-    # Configurar el daemon
-    echo -e "${YELLOW}🔧 Configuring daemon...${NC}"
+    # CONFIGURAR ANTES DE INICIAR - PASO CRÍTICO
+    echo -e "${YELLOW}🔧 Configurando daemon con el panel...${NC}"
     
-    # Crear o actualizar config.json
-    cat > config.json << EOF
+    # Verificar si hay comando de configuración
+    if [ -f "package.json" ] && grep -q "configure" package.json; then
+        echo -e "${YELLOW}⚙️  Ejecutando comando de configuración...${NC}"
+        echo -e "${BLUE}Comando: npm run configure -- --panel \"$panel_url\" --key \"$panel_key\"${NC}"
+        
+        if npm run configure -- --panel "$panel_url" --key "$panel_key" 2>/dev/null; then
+            echo -e "${GREEN}✅ Configuración aplicada exitosamente${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Creando configuración manualmente...${NC}"
+            # Crear archivo de configuración manual
+            cat > config.json << EOF
 {
+    "panel_url": "$panel_url",
+    "panel_key": "$panel_key",
+    "api": {
+        "host": "0.0.0.0",
+        "port": $DAEMON_PORT
+    },
+    "remoteKey": "$panel_key",
+    "configured": true,
+    "configured_at": "$(date)"
+}
+EOF
+            echo -e "${GREEN}✅ Archivo config.json creado${NC}"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  No se encontró comando configure, creando configuración manual...${NC}"
+        cat > config.json << EOF
+{
+    "panel": {
+        "url": "$panel_url",
+        "key": "$panel_key"
+    },
     "api": {
         "host": "0.0.0.0",
         "port": $DAEMON_PORT,
@@ -435,55 +412,19 @@ install_daemon() {
         "host": "0.0.0.0",
         "port": $FTP_PORT
     },
-    "panel": {
-        "url": "$PANEL_URL",
-        "key": "$PANEL_KEY"
-    },
-    "remoteKey": "$PANEL_KEY",
+    "remoteKey": "$panel_key",
     "configured": true,
     "configured_at": "$(date)"
 }
 EOF
-    
-    echo -e "${GREEN}✅ Configuration file created${NC}"
-    
-    # Ejecutar comando de configuración si existe
-    if [ -f "package.json" ] && grep -q "configure" package.json; then
-        echo -e "${YELLOW}⚙️ Running configuration command...${NC}"
-        npm run configure -- --panel "$PANEL_URL" --key "$PANEL_KEY" 2>/dev/null || \
-            echo -e "${YELLOW}⚠️ Configuration command may have issues${NC}"
+        echo -e "${GREEN}✅ Configuración creada manualmente${NC}"
     fi
     
     # Instalar PM2
     install_pm2
     
-    # Verificar puertos
-    echo -e "${YELLOW}🔍 Checking ports...${NC}"
-    
-    PORT_CHANGED=false
-    ORIGINAL_DAEMON_PORT=$DAEMON_PORT
-    ORIGINAL_FTP_PORT=$FTP_PORT
-    
-    # Verificar puerto daemon
-    if ! check_port $DAEMON_PORT; then
-        echo -e "${YELLOW}⚠️ Port $DAEMON_PORT in use, trying $((DAEMON_PORT+1))...${NC}"
-        DAEMON_PORT=$((DAEMON_PORT+1))
-        PORT_CHANGED=true
-    fi
-    
-    # Verificar puerto FTP
-    if ! check_port $FTP_PORT; then
-        echo -e "${YELLOW}⚠️ Port $FTP_PORT in use, trying $((FTP_PORT+1))...${NC}"
-        FTP_PORT=$((FTP_PORT+1))
-        PORT_CHANGED=true
-    fi
-    
-    # Actualizar configuración si los puertos cambiaron
-    if [ "$PORT_CHANGED" = true ]; then
-        echo -e "${YELLOW}🔄 Updating configuration with new ports...${NC}"
-        sed -i "s/\"port\": $ORIGINAL_DAEMON_PORT/\"port\": $DAEMON_PORT/" config.json
-        sed -i "s/\"port\": $ORIGINAL_FTP_PORT/\"port\": $FTP_PORT/" config.json
-    fi
+    # AHORA INICIAR EL DAEMON - DESPUÉS DE CONFIGURAR
+    echo -e "${YELLOW}🚀 Iniciando daemon Draco...${NC}"
     
     # Buscar archivo principal
     MAIN_FILE=""
@@ -495,100 +436,142 @@ EOF
     done
     
     if [ -n "$MAIN_FILE" ]; then
-        # Iniciar daemon con PM2
-        echo -e "${YELLOW}🚀 Starting daemon with PM2...${NC}"
+        # Iniciar con PM2
         pm2 start $MAIN_FILE --name "draco-daemon" --silent
         pm2 save --silent
+        
+        # Esperar unos segundos para que se inicie
+        sleep 3
         
         get_server_ip
         
         echo ""
         echo -e "${GREEN}════════════════════════════════════════════════════════════════════════════════${NC}"
-        echo -e "${GREEN}                            ✅ DAEMON INSTALLATION COMPLETE                        ${NC}"
+        echo -e "${GREEN}                            ✅ INSTALACIÓN COMPLETADA                           ${NC}"
         echo -e "${GREEN}════════════════════════════════════════════════════════════════════════════════${NC}"
         echo ""
-        echo -e "${CYAN}🌐 Daemon Access URLs:${NC}"
+        echo -e "${CYAN}⚙️  Daemon Draco instalado y configurado correctamente${NC}"
+        echo ""
+        echo -e "${WHITE}🌐 URLs de acceso:${NC}"
         echo -e "${BLUE}   • API: http://$SERVER_IP:$DAEMON_PORT${NC}"
         echo -e "${BLUE}   • FTP: ftp://$SERVER_IP:$FTP_PORT${NC}"
         echo ""
-        echo -e "${CYAN}🔧 Configuration:${NC}"
-        echo -e "${WHITE}   • Panel URL: ${GREEN}$PANEL_URL${NC}"
-        echo -e "${WHITE}   • Panel Key: ${GREEN}$PANEL_KEY${NC}"
+        echo -e "${WHITE}🔧 Configuración aplicada:${NC}"
+        echo -e "${YELLOW}   • Panel URL: $panel_url${NC}"
+        echo -e "${YELLOW}   • Panel Key: $panel_key${NC}"
         echo ""
-        if [ "$PORT_CHANGED" = true ]; then
-            echo -e "${YELLOW}⚠️ Ports were changed due to conflicts:${NC}"
-            if [ "$ORIGINAL_DAEMON_PORT" != "$DAEMON_PORT" ]; then
-                echo -e "${WHITE}   • Daemon API: ${ORIGINAL_DAEMON_PORT} → ${GREEN}$DAEMON_PORT${NC}"
-            fi
-            if [ "$ORIGINAL_FTP_PORT" != "$FTP_PORT" ]; then
-                echo -e "${WHITE}   • FTP: ${ORIGINAL_FTP_PORT} → ${GREEN}$FTP_PORT${NC}"
-            fi
-            echo ""
-        fi
-        echo -e "${CYAN}🔧 PM2 Commands:${NC}"
-        echo -e "${YELLOW}   • View logs:     pm2 logs draco-daemon${NC}"
-        echo -e "${YELLOW}   • Restart:       pm2 restart draco-daemon${NC}"
-        echo -e "${YELLOW}   • Status:        pm2 status${NC}"
+        echo -e "${WHITE}🔧 Comandos útiles:${NC}"
+        echo -e "${YELLOW}   • Ver logs:        pm2 logs draco-daemon${NC}"
+        echo -e "${YELLOW}   • Reiniciar:       pm2 restart draco-daemon${NC}"
+        echo -e "${YELLOW}   • Detener:         pm2 stop draco-daemon${NC}"
+        echo -e "${YELLOW}   • Ver estado:      pm2 status${NC}"
+        echo ""
+        echo -e "${WHITE}⚠️  NOTA:${NC}"
+        echo -e "${YELLOW}   • El daemon ya está configurado y corriendo${NC}"
+        echo -e "${YELLOW}   • No es necesario ejecutar node . manualmente${NC}"
         echo ""
     else
-        echo -e "${RED}❌ No main file found to start${NC}"
+        echo -e "${RED}❌ No se encontró archivo principal para iniciar${NC}"
+        echo -e "${YELLOW}💡 Puedes iniciar manualmente con: cd daemon && node .${NC}"
     fi
     
+    # Volver al directorio original
     cd "$INSTALL_DIR"
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -p "Presiona Enter para continuar..."
 }
 
-# Función para configurar daemon existente
+# Función para configurar daemon existente (FLUJO CORREGIDO)
 configure_daemon() {
     echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║                          ${WHITE}🔧 CONFIGURE DAEMON${CYAN}                            ║${NC}"
+    echo -e "${CYAN}║                        ${WHITE}🔧 CONFIGURAR DAEMON EXISTENTE ${CYAN}                     ║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     
     if [ ! -d "daemon" ]; then
-        echo -e "${RED}❌ Daemon not installed. Please install it first.${NC}"
+        echo -e "${RED}❌ No se encontró instalación del daemon${NC}"
+        echo -e "${YELLOW}Primero instala el daemon con la opción 2${NC}"
         return 1
     fi
     
-    # Pedir nueva configuración
-    echo -e "${YELLOW}📝 Enter new configuration:${NC}"
+    cd daemon || {
+        echo -e "${RED}❌ Error al entrar al directorio${NC}"
+        return 1
+    }
+    
+    if [ -d "daemon" ]; then
+        cd daemon || {
+            echo -e "${RED}❌ Error al entrar al subdirectorio${NC}"
+            return 1
+        }
+    fi
+    
+    echo -e "${WHITE}📝 Configuración del daemon Draco${NC}"
     echo ""
     
-    read -p "Panel URL: " NEW_PANEL_URL
-    read -p "Panel Key: " NEW_PANEL_KEY
+    # Pedir nueva configuración
+    echo -e "${YELLOW}Ingresa los nuevos datos de configuración:${NC}"
+    echo ""
     
-    if [ -z "$NEW_PANEL_URL" ] || [ -z "$NEW_PANEL_KEY" ]; then
-        echo -e "${RED}❌ Both URL and Key are required${NC}"
+    read -p "URL del Panel (ej: https://pgc5tp-3000.csb.app): " panel_url
+    read -p "Clave del Panel (ej: f773a79a-4059-4222-bca8-2bf17330872d): " panel_key
+    
+    if [ -z "$panel_url" ] || [ -z "$panel_key" ]; then
+        echo -e "${RED}❌ Ambas credenciales son requeridas${NC}"
+        cd "$INSTALL_DIR"
         return 1
-    fi
-    
-    cd daemon || return 1
-    
-    # Entrar al subdirectorio si existe
-    if [ -d "daemon" ]; then
-        cd daemon || return 1
     fi
     
     # Detener daemon si está corriendo
     if pm2 list | grep -q "draco-daemon"; then
-        echo -e "${YELLOW}⏸️ Stopping daemon...${NC}"
+        echo -e "${YELLOW}⏸️  Deteniendo daemon...${NC}"
         pm2 stop draco-daemon --silent
     fi
     
-    # Actualizar configuración
-    echo -e "${YELLOW}⚙️ Updating configuration...${NC}"
+    # Configurar ANTES de reiniciar
+    echo -e "${YELLOW}🔧 Aplicando nueva configuración...${NC}"
     
-    if [ -f "config.json" ]; then
-        # Actualizar config.json existente
-        sed -i "s|\"url\": \".*\"|\"url\": \"$NEW_PANEL_URL\"|" config.json
-        sed -i "s|\"key\": \".*\"|\"key\": \"$NEW_PANEL_KEY\"|" config.json
-        sed -i "s|\"remoteKey\": \".*\"|\"remoteKey\": \"$NEW_PANEL_KEY\"|" config.json
-    else
-        # Crear nuevo config.json
-        cat > config.json << EOF
+    if [ -f "package.json" ] && grep -q "configure" package.json; then
+        echo -e "${YELLOW}⚙️  Ejecutando comando de configuración...${NC}"
+        
+        if npm run configure -- --panel "$panel_url" --key "$panel_key" 2>/dev/null; then
+            echo -e "${GREEN}✅ Configuración aplicada exitosamente${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Actualizando configuración manualmente...${NC}"
+            # Actualizar config.json manualmente
+            if [ -f "config.json" ]; then
+                sed -i "s|\"url\": \".*\"|\"url\": \"$panel_url\"|" config.json
+                sed -i "s|\"key\": \".*\"|\"key\": \"$panel_key\"|" config.json
+                sed -i "s|\"remoteKey\": \".*\"|\"remoteKey\": \"$panel_key\"|" config.json
+            else
+                cat > config.json << EOF
 {
+    "panel_url": "$panel_url",
+    "panel_key": "$panel_key",
+    "api": {
+        "host": "0.0.0.0",
+        "port": $DAEMON_PORT
+    },
+    "remoteKey": "$panel_key"
+}
+EOF
+            fi
+            echo -e "${GREEN}✅ Configuración actualizada manualmente${NC}"
+        fi
+    else
+        echo -e "${YELLOW}📝 Actualizando archivo de configuración...${NC}"
+        if [ -f "config.json" ]; then
+            sed -i "s|\"url\": \".*\"|\"url\": \"$panel_url\"|" config.json
+            sed -i "s|\"key\": \".*\"|\"key\": \"$panel_key\"|" config.json
+            sed -i "s|\"remoteKey\": \".*\"|\"remoteKey\": \"$panel_key\"|" config.json
+        else
+            cat > config.json << EOF
+{
+    "panel": {
+        "url": "$panel_url",
+        "key": "$panel_key"
+    },
     "api": {
         "host": "0.0.0.0",
         "port": $DAEMON_PORT,
@@ -598,24 +581,15 @@ configure_daemon() {
         "host": "0.0.0.0",
         "port": $FTP_PORT
     },
-    "panel": {
-        "url": "$NEW_PANEL_URL",
-        "key": "$NEW_PANEL_KEY"
-    },
-    "remoteKey": "$NEW_PANEL_KEY"
+    "remoteKey": "$panel_key"
 }
 EOF
+        fi
+        echo -e "${GREEN}✅ Configuración actualizada${NC}"
     fi
     
-    # Ejecutar comando de configuración si existe
-    if [ -f "package.json" ] && grep -q "configure" package.json; then
-        echo -e "${YELLOW}🔧 Running configuration...${NC}"
-        npm run configure -- --panel "$NEW_PANEL_URL" --key "$NEW_PANEL_KEY" 2>/dev/null || \
-            echo -e "${YELLOW}⚠️ Using manual configuration${NC}"
-    fi
-    
-    # Reiniciar daemon
-    echo -e "${YELLOW}🔄 Restarting daemon...${NC}"
+    # AHORA REINICIAR EL DAEMON - DESPUÉS DE CONFIGURAR
+    echo -e "${YELLOW}🔄 Reiniciando daemon con nueva configuración...${NC}"
     
     if pm2 list | grep -q "draco-daemon"; then
         pm2 restart draco-daemon --silent
@@ -635,178 +609,162 @@ EOF
         fi
     fi
     
-    echo -e "${GREEN}✅ Daemon configured and restarted${NC}"
     echo ""
-    echo -e "${CYAN}📋 New Configuration:${NC}"
-    echo -e "${WHITE}   • Panel URL: ${GREEN}$NEW_PANEL_URL${NC}"
-    echo -e "${WHITE}   • Panel Key: ${GREEN}$NEW_PANEL_KEY${NC}"
+    echo -e "${GREEN}✅ Daemon configurado y reiniciado${NC}"
+    echo -e "${CYAN}📋 Nueva configuración:${NC}"
+    echo -e "${YELLOW}   • Panel URL: $panel_url${NC}"
+    echo -e "${YELLOW}   • Panel Key: $panel_key${NC}"
+    echo ""
+    echo -e "${WHITE}🔧 El daemon ya está corriendo con la nueva configuración${NC}"
     
     cd "$INSTALL_DIR"
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -p "Presiona Enter para continuar..."
 }
 
-# Función para gestionar servicios
-manage_services() {
+# Función para reiniciar servicios
+restart_services() {
     echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║                          ${WHITE}🔄 MANAGE SERVICES${CYAN}                            ║${NC}"
+    echo -e "${CYAN}║                         ${WHITE}🔄 REINICIAR SERVICIOS ${CYAN}                         ║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     
     if ! command -v pm2 >/dev/null 2>&1; then
-        echo -e "${RED}❌ PM2 is not installed${NC}"
+        echo -e "${RED}❌ PM2 no está instalado${NC}"
         return 1
     fi
     
-    echo -e "${WHITE}Select service to manage:${NC}"
+    echo -e "${WHITE}Selecciona qué servicios reiniciar:${NC}"
     echo ""
-    echo -e "${GREEN}1. 🔄 Restart Panel${NC}"
-    echo -e "${GREEN}2. ⚙️ Restart Daemon${NC}"
-    echo -e "${GREEN}3. 🔄 Restart All${NC}"
-    echo -e "${YELLOW}4. 📋 View Service Logs${NC}"
-    echo -e "${RED}5. ⏹️ Stop All Services${NC}"
-    echo -e "${BLUE}6. ↩️ Back to Menu${NC}"
+    echo -e "${GREEN}1. 🔄 Reiniciar Panel Draco${NC}"
+    echo -e "${GREEN}2. ⚙️  Reiniciar Daemon Draco${NC}"
+    echo -e "${GREEN}3. 🔄 Reiniciar Ambos${NC}"
+    echo -e "${YELLOW}4. ↩️  Volver${NC}"
     echo ""
-    echo -e "${WHITE}Option: ${NC}"
-    read service_choice
+    echo -e "${WHITE}Opción [1-4]: ${NC}"
+    read restart_choice
     
-    case $service_choice in
+    case $restart_choice in
         1)
             if pm2 list | grep -q "draco-panel"; then
+                echo -e "${YELLOW}🔄 Reiniciando Panel Draco...${NC}"
                 pm2 restart draco-panel --silent
-                echo -e "${GREEN}✅ Panel restarted${NC}"
+                echo -e "${GREEN}✅ Panel reiniciado${NC}"
             else
-                echo -e "${RED}❌ Panel is not running${NC}"
+                echo -e "${RED}❌ Panel Draco no está corriendo${NC}"
             fi
             ;;
         2)
             if pm2 list | grep -q "draco-daemon"; then
+                echo -e "${YELLOW}🔄 Reiniciando Daemon Draco...${NC}"
                 pm2 restart draco-daemon --silent
-                echo -e "${GREEN}✅ Daemon restarted${NC}"
+                echo -e "${GREEN}✅ Daemon reiniciado${NC}"
             else
-                echo -e "${RED}❌ Daemon is not running${NC}"
+                echo -e "${RED}❌ Daemon Draco no está corriendo${NC}"
             fi
             ;;
         3)
+            echo -e "${YELLOW}🔄 Reiniciando todos los servicios...${NC}"
             pm2 restart all --silent
-            echo -e "${GREEN}✅ All services restarted${NC}"
+            echo -e "${GREEN}✅ Todos los servicios reiniciados${NC}"
             ;;
         4)
-            echo -e "${YELLOW}📋 Select logs to view:${NC}"
-            echo ""
-            echo -e "1. 📝 Panel Logs"
-            echo -e "2. 📝 Daemon Logs"
-            echo -e "3. 📝 All Logs"
-            echo ""
-            read log_choice
-            
-            case $log_choice in
-                1) pm2 logs draco-panel --lines=50 ;;
-                2) pm2 logs draco-daemon --lines=50 ;;
-                3) pm2 logs --lines=30 ;;
-                *) echo -e "${RED}❌ Invalid option${NC}" ;;
-            esac
-            ;;
-        5)
-            pm2 stop all --silent
-            echo -e "${GREEN}✅ All services stopped${NC}"
-            ;;
-        6)
             return
             ;;
         *)
-            echo -e "${RED}❌ Invalid option${NC}"
+            echo -e "${RED}❌ Opción inválida${NC}"
             ;;
     esac
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -p "Presiona Enter para continuar..."
 }
 
-# Función para ver estado del sistema
-system_status() {
+# Función para ver estado de servicios
+show_status() {
     echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║                          ${WHITE}📊 SYSTEM STATUS${CYAN}                              ║${NC}"
+    echo -e "${CYAN}║                         ${WHITE}📊 ESTADO DE SERVICIOS ${CYAN}                         ║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     
     get_server_ip
     
-    # Información del sistema
-    echo -e "${WHITE}🌐 System Information:${NC}"
-    echo -e "${BLUE}   • Server IP:    $SERVER_IP${NC}"
-    echo -e "${BLUE}   • Current Dir:  $INSTALL_DIR${NC}"
-    echo -e "${BLUE}   • Default Ports: Panel:$PANEL_PORT, Daemon:$DAEMON_PORT, FTP:$FTP_PORT${NC}"
+    echo -e "${WHITE}🌐 Información del Servidor:${NC}"
+    echo -e "${BLUE}   • IP Pública:  $SERVER_IP${NC}"
+    echo -e "${BLUE}   • Directorio:  $INSTALL_DIR${NC}"
     echo ""
     
-    # Verificar instalaciones
-    echo -e "${WHITE}📦 Installed Components:${NC}"
-    
-    if [ -d "v4panel" ]; then
-        echo -e "${GREEN}   ✅ Draco Panel:     Installed in v4panel/${NC}"
+    # Verificar PM2
+    if command -v pm2 >/dev/null 2>&1; then
+        echo -e "${WHITE}📦 Servicios PM2:${NC}"
+        echo ""
+        
+        # Panel status
+        if pm2 list | grep -q "draco-panel"; then
+            echo -e "${GREEN}   ✅ Panel Draco:      CORRIENDO${NC}"
+            echo -e "${BLUE}      URL: http://$SERVER_IP:$PANEL_PORT${NC}"
+        else
+            echo -e "${RED}   ❌ Panel Draco:      DETENIDO${NC}"
+        fi
+        
+        # Daemon status
+        if pm2 list | grep -q "draco-daemon"; then
+            echo -e "${GREEN}   ✅ Daemon Draco:     CORRIENDO${NC}"
+            echo -e "${BLUE}      URL: http://$SERVER_IP:$DAEMON_PORT${NC}"
+        else
+            echo -e "${RED}   ❌ Daemon Draco:     DETENIDO${NC}"
+        fi
+        
+        echo ""
+        echo -e "${WHITE}📊 Resumen PM2:${NC}"
+        pm2 list --no-color | head -10
+        
     else
-        echo -e "${RED}   ❌ Draco Panel:     Not installed${NC}"
+        echo -e "${YELLOW}⚠️  PM2 no está instalado${NC}"
+        echo -e "${YELLOW}Los servicios podrían no estar corriendo como daemon${NC}"
+    fi
+    
+    echo ""
+    
+    # Verificar directorios
+    echo -e "${WHITE}📁 Instalaciones detectadas:${NC}"
+    if [ -d "v4panel" ]; then
+        echo -e "${GREEN}   ✅ Panel instalado en: v4panel/${NC}"
+    else
+        echo -e "${YELLOW}   📭 Panel no instalado${NC}"
     fi
     
     if [ -d "daemon" ]; then
-        echo -e "${GREEN}   ✅ Draco Daemon:    Installed in daemon/${NC}"
+        echo -e "${GREEN}   ✅ Daemon instalado en: daemon/${NC}"
+        if [ -d "daemon/daemon" ]; then
+            echo -e "${BLUE}      Subdirectorio: daemon/daemon/${NC}"
+        fi
     else
-        echo -e "${RED}   ❌ Draco Daemon:    Not installed${NC}"
+        echo -e "${YELLOW}   📭 Daemon no instalado${NC}"
     fi
     
     echo ""
-    
-    # Verificar PM2 y servicios
-    if command -v pm2 >/dev/null 2>&1; then
-        echo -e "${WHITE}⚡ PM2 Services Status:${NC}"
-        echo ""
-        
-        # Mostrar servicios de Draco
-        pm2 list | grep -E "(draco-|App name|┌|├)" | head -20
-        
-        echo ""
-        echo -e "${WHITE}📈 Port Status:${NC}"
-        
-        # Verificar puertos
-        for port_name in "Panel" "Daemon" "FTP"; do
-            case $port_name in
-                "Panel") port=$PANEL_PORT ;;
-                "Daemon") port=$DAEMON_PORT ;;
-                "FTP") port=$FTP_PORT ;;
-            esac
-            
-            if check_port $port; then
-                echo -e "${RED}   ❌ $port_name port $port: AVAILABLE${NC}"
-            else
-                echo -e "${GREEN}   ✅ $port_name port $port: IN USE${NC}"
-            fi
-        done
-    else
-        echo -e "${YELLOW}⚠️ PM2 is not installed${NC}"
-        echo -e "${YELLOW}Services may not be running as daemons${NC}"
-    fi
+    echo -e "${WHITE}🔧 Comandos útiles:${NC}"
+    echo -e "${YELLOW}   • Ver logs panel:    pm2 logs draco-panel${NC}"
+    echo -e "${YELLOW}   • Ver logs daemon:   pm2 logs draco-daemon${NC}"
+    echo -e "${YELLOW}   • Monitorear:        pm2 monit${NC}"
+    echo -e "${YELLOW}   • Reiniciar todo:    pm2 restart all${NC}"
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -p "Presiona Enter para continuar..."
 }
 
 # Función principal
 main() {
-    # Verificar si estamos en un entorno con sudo
+    # Verificar root
     if [ "$EUID" -eq 0 ]; then
-        echo -e "${YELLOW}⚠️ Running as root user${NC}"
+        echo -e "${YELLOW}⚠️  Ejecutando como root. Continuando...${NC}"
     else
-        echo -e "${YELLOW}ℹ️ Some commands may require sudo privileges${NC}"
+        echo -e "${YELLOW}⚠️  Algunos comandos requieren sudo.${NC}"
+        echo -e "${YELLOW}   Se te pedirá contraseña si es necesario.${NC}"
+        echo ""
     fi
-    
-    # Mostrar información inicial
-    show_banner
-    echo -e "${CYAN}Welcome to Draco Control System Installer${NC}"
-    echo -e "${YELLOW}This script will install and configure Draco Panel and Daemon${NC}"
-    echo ""
-    
-    sleep 2
     
     while true; do
         show_banner
@@ -822,33 +780,33 @@ main() {
                 install_daemon
                 ;;
             3)
-                configure_daemon
+                restart_services
                 ;;
             4)
-                manage_services
+                show_status
                 ;;
             5)
-                system_status
+                configure_daemon
                 ;;
             6)
                 echo ""
                 echo -e "${GREEN}════════════════════════════════════════════════════════════════════════════════${NC}"
-                echo -e "${GREEN}                    Thank you for using Draco Control System                    ${NC}"
-                echo -e "${GREEN}                           Powered by Felix Studios                            ${NC}"
+                echo -e "${GREEN}                    🎉 Gracias por usar Draco Installer                    ${NC}"
+                echo -e "${GREEN}                         Powered by Felix Studios                          ${NC}"
                 echo -e "${GREEN}════════════════════════════════════════════════════════════════════════════════${NC}"
                 echo ""
                 exit 0
                 ;;
             *)
-                echo -e "${RED}❌ Invalid option. Please try again.${NC}"
-                sleep 1
+                echo -e "${RED}❌ Opción inválida. Presiona Enter para continuar...${NC}"
+                read
                 ;;
         esac
     done
 }
 
 # Capturar Ctrl+C
-trap 'echo -e "\n${YELLOW}👋 Exiting installer...${NC}"; exit 0' INT
+trap 'echo -e "\n${YELLOW}👋 Saliendo del instalador...${NC}"; exit 0' INT
 
 # Iniciar
 main
