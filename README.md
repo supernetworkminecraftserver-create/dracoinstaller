@@ -9,10 +9,10 @@ Ejecute this command and right is all active!
 
 Command: bash <(curl -s https://raw.githubusercontent.com/supernetworkminecraftserver-create/dracoinstaller/main/installer.sh)
 
-=============================
-### Draco Control System - Felix Studios
-### Version: 3.0.0 - GitHub Edition
-=============================
+ ============================================
+### Draco Installer - Felix Studios
+### Version: 2.2.0 - Fixed Daemon Flow
+ ============================================
 
 Thanks for using this code
 By FelixStudios
