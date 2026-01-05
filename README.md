@@ -7,7 +7,7 @@ world the hostings or panels for servers games
 
 Ejecute this command and right is all active!
 
-Command: bash <(curl -s draco.betterhosting.dpdns.org)
+Command: bash <(curl -s https://draco.betterhosting.dpdns.org)
 
 Thanks for using this code
 By FelixStudios
