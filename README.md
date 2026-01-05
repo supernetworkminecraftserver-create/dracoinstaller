@@ -7,7 +7,12 @@ world the hostings or panels for servers games
 
 Ejecute this command and right is all active!
 
-Command: bash <(curl -s https://gist.githubusercontent.com/FelixDevvv/083a82d43467b74f641008288d000183/raw/a8c79df96a464430ea3c639303c679f9ac907cc4/installer.sh)
+Command: bash <(curl -s https://raw.githubusercontent.com/supernetworkminecraftserver-create/dracoinstaller/main/installer.sh)
+
+=============================
+### Draco Control System - Felix Studios
+### Version: 3.0.0 - GitHub Edition
+=============================
 
 Thanks for using this code
 By FelixStudios
